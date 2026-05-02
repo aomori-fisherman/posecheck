@@ -18,23 +18,22 @@ import os
 from pathlib import Path
 
 # ============================================================
-# モデルパス（ローカル / Streamlit Cloud 両対応）
+# モデルパス（ローカル / クラウド 両対応）
 # ============================================================
 LOCAL_MODEL = "C:/tmp/pose-analyzer/pose_landmarker_heavy.task"
 CLOUD_MODEL = str(Path(__file__).parent / "pose_landmarker_heavy.task")
+CACHE_MODEL = "/tmp/pose_landmarker_heavy.task"
 MODEL_URL = "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_heavy/float16/latest/pose_landmarker_heavy.task"
 
 def get_model_path():
     """モデルファイルのパスを取得。なければ自動ダウンロード"""
-    if os.path.exists(LOCAL_MODEL):
-        return LOCAL_MODEL
-    if os.path.exists(CLOUD_MODEL):
-        return CLOUD_MODEL
-    # Cloud環境: 自動ダウンロード
+    for path in [LOCAL_MODEL, CLOUD_MODEL, CACHE_MODEL]:
+        if os.path.exists(path):
+            return path
+    # クラウド環境: 自動ダウンロード
     import urllib.request
-    os.makedirs(os.path.dirname(CLOUD_MODEL) or ".", exist_ok=True)
-    urllib.request.urlretrieve(MODEL_URL, CLOUD_MODEL)
-    return CLOUD_MODEL
+    urllib.request.urlretrieve(MODEL_URL, CACHE_MODEL)
+    return CACHE_MODEL
 
 MODEL_PATH = get_model_path()
 
